@@ -219,5 +219,6 @@ Thumbs.db #thumbnail cache on Windows
 
 # profiling data
 
-
+# redis dump
+.rdb
 # End of https://www.toptal.com/developers/gitignore/api/python,flask
