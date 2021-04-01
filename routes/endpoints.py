@@ -113,4 +113,3 @@ def delete_ec2(id, session):
             return {"message": "Resource deleted"}, 200
         except ClientError as e:
             return {"message": e.response["Error"]["Message"]}, 500
-            
