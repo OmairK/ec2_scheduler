@@ -11,10 +11,10 @@ class EC2Schema(Schema):
     Schema for ec2 instances
     """
     ec2_id = fields.Str(required=True)
-    schedule_days = fields.Int(required=True, validate=validate.Range([1,7]))
-    last_state_change = fields.Date(dump_only=True, dump_to="lastStateChange")
-    state = field.Str(dump_only=True)
-    allow_scheduling = fields.Bool(dump_only=True, dump_to="allowScheduling")
+    schedule = fields.Int(required=True, validate=validate.Range(min=1,max=7))
+    last_state_change = fields.Date(data_key="lastStateChange")
+    state = fields.Str()
+    allow_scheduling = fields.Bool(data_key="allowScheduling")
 
 
 class EC2SCollection(NamedTuple):

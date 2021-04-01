@@ -24,7 +24,7 @@ class EC2ScheduleModel:
     
     def validate_ec2_instance(self):
         import boto3
-        ec2_resource = boto3.Resource("ec2")
+        ec2_resource = boto3.resource("ec2")
         ec2_instance = ec2_resource.Instance(self.ec2_id)
 
         try:
@@ -44,23 +44,21 @@ class EC2ScheduleModel:
         self.allow_scheduling = False
         self.schedule = None
         self.last_state_change = date.today()
-
-        for key, value in new_schedule.items():
-            setattr(self, key, value)
-
         return True
 
     def update_schedule(self, new_schedule):
         """
         Handles the case where the schedule of an ec2 instance is updated
         """
-        if self.state == EC2State.STARTED and self.schedule > new_schedule:
+        if self.state == EC2State.STARTED and (self.schedule > new_schedule):
+            self.allow_scheduling = True
             self.state = EC2State.STOPPED
             self.schedule = new_schedule
             return True
             
-        elif self.state == EC2State.STOPPED and self.schedule < new_schedule:
+        elif self.state == EC2State.STOPPED and (self.schedule < new_schedule):
             self.state = EC2State.STARTED
+            self.allow_scheduling = True
             self.schedule = new_schedule
             return True
 
