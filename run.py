@@ -1,5 +1,4 @@
 from flask import Flask
-import data
 
 app = Flask(__name__)
 
