@@ -7,7 +7,7 @@ class EC2ScheduleModel:
     Proxy model for preprocessing.
     Could be used for plugging in an ORM
     """
-    def __init__(self, ec2_id, schedule, state=None, last_state_change=None, allow_scheduling=None):
+    def __init__(self, ec2_id, schedule=None, state=None, last_state_change=None, allow_scheduling=None):
         self.ec2_id = ec2_id
         self.state = state
         self.last_state_change = last_state_change

@@ -11,7 +11,7 @@ class EC2Schema(Schema):
     Schema for ec2 instances
     """
     ec2_id = fields.Str(required=True)
-    schedule = fields.Int(required=True, validate=validate.Range(min=1,max=7))
+    schedule = fields.Int(validate=validate.Range(min=1,max=7))
     last_state_change = fields.Date(data_key="lastStateChange")
     state = fields.Str()
     allow_scheduling = fields.Bool(data_key="allowScheduling")

@@ -103,6 +103,7 @@ def delete_ec2(id, session):
     except ClientError as e:
         return {"message": e.response["Error"]["Message"]}, 400
 
+    ec2_json["Item"].pop("schedule")
     ec2_object = EC2ScheduleModel(**ec2_schema.load(ec2_json["Item"]))
     update = ec2_object.delete_schedule()
     ec2_dump = ec2_schema.dump(ec2_object)

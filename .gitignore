@@ -221,4 +221,7 @@ Thumbs.db #thumbnail cache on Windows
 
 # redis dump
 dump.rdb
+
+# Lambda zips
+*.zip
 # End of https://www.toptal.com/developers/gitignore/api/python,flask
