@@ -40,7 +40,7 @@ The IAM role used provides the following permissions
 $ git clone git@github.com:OmairK/ec2_scheduler.git
 $ cd ec2_scheduler
 
-#env variables
+# env variables
 $ cp .env .ok_env
 $ vim .ok_env
 
@@ -48,3 +48,7 @@ $ docker-compose build
 $ docker compose up -d
 
 ```
+### Future Enhancements
+- Standardize API exception
+- Cleanup
+- Interactive swagger
