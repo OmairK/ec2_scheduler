@@ -10,3 +10,4 @@ The architecture broadly contains 4 components.
  
  The REST API and the celery monitor updates the entries in the dynamodb table depending upon the scenario. Any updates/insertions in the db creates a dynamodb stream which triggers the lamdba function. The triggered lambda function performs scheduling action on the updated ec2_schedule, i.e. starting, stopping and adding/removing tags on the ec2 instance.
  ![image info](./misc/arch.png)
+

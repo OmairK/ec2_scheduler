@@ -1,22 +1,32 @@
 version: '3'
 
-services:
-    # web:
-    #     build: ./api
-    #     command: bash -c "python manage.py migrate && python manage.py flush --no-input && python manage.py runserver 0.0.0.0:8000"
-    #     ports:
-    #         - "8000:8000"
-    #     depends_on:
-    #         - db
-    #         - redis
+services:  
+  flask:
+    container_name: flask
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+    - .ok_env
+    expose:
+      - "8080"
+  nginx:
+    build:
+      context: ./misc/nginx
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
 
-    redis:
-        build: ./misc/redis
-        ports:
-            - "6379:6379"
+
+  redis:
+    build: ./misc/redis
+    ports:
+      - "6379:6379"
 
 
-    celery:
-        build: ./celery_monitor
-        depends_on:
-            - redis
+  celery:
+    build: ./celery_monitor
+    env_file:
+    - .ok_env
+    depends_on:
+      - redis
