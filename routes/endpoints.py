@@ -28,7 +28,7 @@ def hello_world():
           id: message
           type: string
     """
-    return jsonify({"message": "Hello World"})
+    return {"message": "Hello World"}
 
 
 @app.route("/ec2/all", methods=["GET"])
