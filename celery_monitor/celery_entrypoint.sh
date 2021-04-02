@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Start Celery Beat
-celery -A celery beat --loglevel=DEBUG &> /log/celery_beat.log&
+celery -A tasks beat --loglevel=DEBUG &> /log/celery_beat.log&
 
 # Start Celery Workers
-celery -A celery worker --loglevel=DEBUG
+celery -A tasks worker --loglevel=DEBUG

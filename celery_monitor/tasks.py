@@ -1,10 +1,12 @@
+
+from datetime import date, datetime
+import os
+
 import boto3
+from boto3.dynamodb.conditions import Key, Attr
 from celery import Celery
 from celery.schedules import crontab
-from datetime import date
 
-from boto3.dynamodb.conditions import Key, Attr
-from datetime import datetime
 
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_RESULT_BACKEND = "redis://localhost:6379"
@@ -13,11 +15,14 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
 
 app = Celery("tasks")
+CELERY_HEART_BEAT = os.environ.get("CELERY_HEART_BEAT", 10)
 
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(10, monitor.s(), name="monitor every 10 seconds")
+    sender.add_periodic_task(
+        CELERY_HEART_BEAT, monitor.s(), name="monitor every 10 seconds"
+    )
 
 
 @app.task
@@ -27,7 +32,6 @@ def monitor():
         .Table("opslyft")
         .scan(FilterExpression=Key("allowScheduling").eq(True))
     )
-    print(ec2_schedules_list)
     for ec2_schedule in ec2_schedules_list["Items"]:
         schedule, update = schedule_monitor(ec2_schedule)
         if update:
@@ -41,11 +45,17 @@ def schedule_monitor(schedule):
     schedule of the instance
     """
     if schedule["state"] == "stopped":
-        if (date.today() - datetime.strptime(schedule["lastStateChange"], '%Y-%d-%m').date()).days >= 7 - int(schedule["schedule"]):
+        if (
+            date.today()
+            - datetime.strptime(schedule["lastStateChange"], "%Y-%d-%m").date()
+        ).days >= 7 - int(schedule["schedule"]):
             schedule["state"] = "started"
             schedule["lastStateChange"] = str(date.today())
     elif schedule["state"] == "started":
-        if (date.today() - datetime.strptime(schedule["lastStateChange"], '%Y-%d-%m').date()).days >= int(schedule["schedule"]):
+        if (
+            date.today()
+            - datetime.strptime(schedule["lastStateChange"], "%Y-%d-%m").date()
+        ).days >= int(schedule["schedule"]):
             schedule["state"] = "stopped"
             schedule["lastStateChange"] = str(date.today())
     else:
