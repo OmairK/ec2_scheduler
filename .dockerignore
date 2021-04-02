@@ -1,4 +1,3 @@
-*env
 __pycache__/
 misc/
 celery_monitor/

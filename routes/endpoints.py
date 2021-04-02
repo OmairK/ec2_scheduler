@@ -67,10 +67,7 @@ def get_ec2s(session):
         ec2_list = session.scan(FilterExpression=Key("allowScheduling").eq(True))
     except ClientError as e:
         return {"message": e.response["Error"]["Message"]}, 500
-    return (
-        ec2_collection_schema.dumps(EC2SCollection(ec2_instances=ec2_list["Items"])),
-        200,
-    )
+    return ec2_collection_schema.dumps(EC2SCollection(ec2_instances=ec2_list["Items"]))
 
 
 @app.route("/ec2/<id>", methods=["GET"])
