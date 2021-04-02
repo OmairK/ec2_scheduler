@@ -52,3 +52,4 @@ $ docker compose up -d
 - Standardize API exception
 - Cleanup
 - Interactive swagger
+- Autodiscovery of ec2 instances
