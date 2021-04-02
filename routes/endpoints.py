@@ -1,27 +1,114 @@
 import boto3
-from run import app
+from boto3.dynamodb.conditions import Key, Attr
 from flask import request
 from botocore.exceptions import ClientError
 from marshmallow import ValidationError
+from flasgger import swag_from
 
 from models.ec2_model import EC2ScheduleModel
 from utils.session import provide_session
-from schemas.ec2_schema import ec2_schema
+from schemas.ec2_schema import (
+    ec2_schema,
+    ec2_collection_schema,
+    EC2SCollection,
+    ec2_dynamo_schema,
+)
+
+from main import app
+
+
+@app.route("/")
+def hello_world():
+    """
+    Health Check endpoint
+    ---
+    responses:
+      200:
+        description: Health check hello world
+        schema:
+          id: message
+          type: string
+    """
+    return {"message": "Hello World"}, 200
+
+
+@app.route("/ec2/all", methods=["GET"])
+@provide_session
+def get_ec2s(session):
+    """
+    Creates schedule for a valid ec2 instance
+    ---
+    definitions:
+      - ec2_item:
+          type: object
+          properties:
+            ec2_id:
+              type: string
+            schedule:
+              type: integer
+            state:
+              type: string
+            lastStateChange:
+              type: string
+            allowScheduling:
+              type: boolean
+    responses:
+      200:
+        description: Returns the schedule of ec2 with the given id
+        schema:
+          type: object
+          properties:
+            ec2_instances:
+              type: array
+              items:
+                $ref: '#/definitions/ec2_item'
+    """
+    try:
+        ec2_list = session.scan(FilterExpression=Key("allowScheduling").eq(True))
+    except ClientError as e:
+        return {"message": e.response["Error"]["Message"]}, 500
+    return (
+        ec2_collection_schema.dumps(EC2SCollection(ec2_instances=ec2_list["Items"])),
+        200,
+    )
 
 
 @app.route("/ec2/<id>", methods=["GET"])
 @provide_session
 def get_ec2(id, session):
     """
-    Creates an ec2 instance
-    :param id: The ec2 id.
-    :return: The ec2 object with the specific id
-    :rtype: object
+    Gets an ec2 instance schedule
+    ---
+    parameters:
+      - name: id
+        in: path
+        type: string
+        required: true
+    definitions:
+      - ec2_item:
+          type: object
+          properties:
+            ec2_id:
+              type: string
+            schedule:
+              type: integer
+            state:
+              type: string
+            lastStateChange:
+              type: string
+            allowScheduling:
+              type: boolean
+    responses:
+      200:
+        description: Returns the schedule of ec2 with the given id
+        schema:
+          $ref: '#/definitions/ec2_item'
     """
     try:
         response = session.get_item(Key={"ec2_id": id})
+        response["Item"]["schedule"] = int(response["Item"]["schedule"])
     except ClientError as e:
-        return {"message": e.response["Error"]["Message"]}, 400
+        return {"message": e.response["Error"]["Message"]}, 500
     else:
         return {"ec2_item": response["Item"]}, 200
 
@@ -30,8 +117,47 @@ def get_ec2(id, session):
 @provide_session
 def create_ec2(session):
     """
-    Creates an ec2 instance
-    :return: The ec2 object with the specific id
+    Creates schedule for a valid ec2 instance
+    ---
+    parameters:
+
+      - name: body
+        in: body
+        required: true
+        type: string
+        schema:
+            id : create_ec2
+            required:
+              - ec2_id
+              - schedule
+            properties:
+              ec2_id:
+                type: string
+                description: Unique identifier representing an ec2 instance
+              schedule:
+                type: integer
+                description: Schedule for the ec2 instance
+
+    definitions:
+      - ec2_item:
+          type: object
+          properties:
+            ec2_id:
+              type: string
+            schedule:
+              type: integer
+            state:
+              type: string
+            lastStateChange:
+              type: string
+            allowScheduling:
+              type: boolean
+    responses:
+      200:
+        description: Returns the schedule of ec2 with the given id
+        schema:
+          $ref: '#/definitions/ec2_item'
+
     """
 
     try:
@@ -58,9 +184,50 @@ def create_ec2(session):
 @provide_session
 def patch_ec2(id, session):
     """
-    Updates the config of ec2 instance with the specific id
-    :param id: The ec2 id.
-    :return: The updated ec2 object
+    Updates schedule of an ec2 instance
+    ---
+    parameters:
+      - name: body
+        in: body
+        required: true
+        type: string
+        schema:
+            id : update_ec2
+            required:
+              - ec2_id
+              - schedule
+            properties:
+              ec2_id:
+                type: string
+                description: Unique identifier representing an ec2 instance
+              schedule:
+                type: integer
+                description: Schedule for the ec2 instance
+      - name: id
+        in: path
+        required: true
+        type: string
+
+    definitions:
+      - ec2_item:
+          type: object
+          properties:
+            ec2_id:
+              type: string
+            schedule:
+              type: integer
+            state:
+              type: string
+            lastStateChange:
+              type: string
+            allowScheduling:
+              type: boolean
+    responses:
+      200:
+        description: Returns the schedule of ec2 with the given id
+        schema:
+          $ref: '#/definitions/ec2_item'
+
     """
     if id != request.json["ec2_id"]:
         return {"message": "The id doesnt match the payload"}, 400
@@ -94,9 +261,21 @@ def patch_ec2(id, session):
 @provide_session
 def delete_ec2(id, session):
     """
-    Deletes the ec2 instance with the specified id
-    :param id: The ec2 id.
-    :return: message on successful deletion
+    Deletes the schedule of an ec2 instance with the specified id
+    ---
+    parameters:
+      - name: id
+        in: path
+        type: string
+        required: true
+    definitions:
+      - message:
+          type: string
+    responses:
+      200:
+        description: Returns the schedule of ec2 with the given id
+        schema:
+          $ref: '#/definitions/message'
     """
     try:
         ec2_json = session.get_item(Key={"ec2_id": id})

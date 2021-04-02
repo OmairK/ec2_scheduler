@@ -4,7 +4,10 @@ app = Flask(__name__)
 
 # Import the API routes
 from routes.endpoints import *
+from flasgger import Swagger
+
 
 # Required because app is imported in other modules
 if __name__== '__main__':
-    app.run(debug=True)
+    Swagger(app)
+    app.run(host="0.0.0.0",debug=True)
