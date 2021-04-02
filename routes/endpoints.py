@@ -3,7 +3,6 @@ from boto3.dynamodb.conditions import Key, Attr
 from flask import request
 from botocore.exceptions import ClientError
 from marshmallow import ValidationError
-from flasgger import swag_from
 
 from models.ec2_model import EC2ScheduleModel
 from utils.session import provide_session
@@ -29,7 +28,7 @@ def hello_world():
           id: message
           type: string
     """
-    return {"message": "Hello World"}, 200
+    return jsonify({"message": "Hello World"})
 
 
 @app.route("/ec2/all", methods=["GET"])
@@ -67,7 +66,7 @@ def get_ec2s(session):
         ec2_list = session.scan(FilterExpression=Key("allowScheduling").eq(True))
     except ClientError as e:
         return {"message": e.response["Error"]["Message"]}, 500
-    return ec2_collection_schema.dumps(EC2SCollection(ec2_instances=ec2_list["Items"]))
+    return ec2_collection_schema.dump(EC2SCollection(ec2_instances=ec2_list["Items"]))
 
 
 @app.route("/ec2/<id>", methods=["GET"])

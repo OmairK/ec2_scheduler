@@ -1,13 +1,12 @@
 import os
 import boto3
 
-from .utils.session import provide_session
-
 
 def ec2_dynamo_init():
-    ec2_id_list = [for i in os.environ.get("EC2_LIST", None).split(" ")]
+    ec2_id_list = os.environ.get("EC2_LIST", None)
     if ec2_id_list != None:
-        resource = boto3.resource{"dynamodb"}
+        ec2_id_list = [str(i) for i in ec2_id_list.split(" ")]
+        resource = boto3.resource("dynamodb")
         table = resource.Table("opslyft")
 
         for ec2_id in ec2_id_list:
