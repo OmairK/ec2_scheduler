@@ -18,7 +18,7 @@ All the components of the application are running as docker containers.
   - Redis Server (Celery Result Backend)
   - Nginx (As a reverse proxy) Container
     
-[API Spec](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/OmairK/ec2_scheduler/master/misc/apispec_1.json) for reference has been provided on redoc.
+[API Spec](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/OmairK/ec2_scheduler/master/misc/apispec_1.json) for reference has been provided on redoc which also includes the spec of bonus endpoint that list all the ec2 instance schedules.
 
     
 The IAM role used provides the following permissions
