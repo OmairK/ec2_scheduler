@@ -1,12 +1,10 @@
-
-from datetime import date, datetime
 import os
+from datetime import date, datetime
 
 import boto3
-from boto3.dynamodb.conditions import Key, Attr
+from boto3.dynamodb.conditions import Attr, Key
 from celery import Celery
 from celery.schedules import crontab
-
 
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_RESULT_BACKEND = "redis://localhost:6379"

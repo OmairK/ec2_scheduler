@@ -1,13 +1,22 @@
 from datetime import date
 
-from utils.state_enums import State, EC2State
+from utils.state_enums import EC2State, State
+
 
 class EC2ScheduleModel:
     """
     Proxy model for preprocessing.
     Could be used for plugging in an ORM
     """
-    def __init__(self, ec2_id, schedule=None, state=None, last_state_change=None, allow_scheduling=None):
+
+    def __init__(
+        self,
+        ec2_id,
+        schedule=None,
+        state=None,
+        last_state_change=None,
+        allow_scheduling=None,
+    ):
         self.ec2_id = ec2_id
         self.state = state
         self.last_state_change = last_state_change
@@ -21,9 +30,10 @@ class EC2ScheduleModel:
         self.last_state_change = date.today()
         self.allow_scheduling = True
         self.state = EC2State.STARTED
-    
+
     def validate_ec2_instance(self):
         import boto3
+
         ec2_resource = boto3.resource("ec2")
         ec2_instance = ec2_resource.Instance(self.ec2_id)
 
@@ -39,7 +49,7 @@ class EC2ScheduleModel:
         """
         if self.state == EC2State.STOPPED and self.allow_scheduling == False:
             return False
-        
+
         self.state = EC2State.STOPPED
         self.allow_scheduling = False
         self.schedule = None
@@ -55,7 +65,7 @@ class EC2ScheduleModel:
             self.state = EC2State.STOPPED
             self.schedule = new_schedule
             return True
-            
+
         elif self.state == EC2State.STOPPED and (self.schedule < new_schedule):
             self.state = EC2State.STARTED
             self.allow_scheduling = True
@@ -66,4 +76,3 @@ class EC2ScheduleModel:
 
     def __str__(self):
         return f"{self.ec2_id} State: {self.state}"
-        

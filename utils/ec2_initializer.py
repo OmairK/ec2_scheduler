@@ -1,4 +1,5 @@
 import os
+
 import boto3
 
 
@@ -11,6 +12,6 @@ def ec2_dynamo_init():
 
         for ec2_id in ec2_id_list:
             try:
-                table.put_item(Item = {"ec2_id": ec2_id})
+                table.put_item(Item={"ec2_id": ec2_id})
             except Exception as e:
                 print(e)

@@ -8,9 +8,15 @@ def lambda_handler(event, context):
     try:
         for record in event["Records"]:
             # 2. Handle event by type
-            if record["eventName"] != "DELETE" and record["dynamodb"]["NewImage"]["state"]["S"] == "started":
+            if (
+                record["eventName"] != "DELETE"
+                and record["dynamodb"]["NewImage"]["state"]["S"] == "started"
+            ):
                 start_instance(record)
-            elif record["eventName"] != "DELETE" and record["dynamodb"]["NewImage"]["state"]["S"] == "stopped":
+            elif (
+                record["eventName"] != "DELETE"
+                and record["dynamodb"]["NewImage"]["state"]["S"] == "stopped"
+            ):
                 stop_instance(record)
         print("------------------------")
         return "Success!"

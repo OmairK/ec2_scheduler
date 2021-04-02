@@ -1,5 +1,5 @@
 class EC2State:
-    
+
     STOPPED = "stopped"
     STARTED = "started"
 

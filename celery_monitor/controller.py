@@ -1,5 +1,5 @@
-from datetime import date
 from copy import deepcopy
+from datetime import date
 
 from utils.state_enums import EC2State
 

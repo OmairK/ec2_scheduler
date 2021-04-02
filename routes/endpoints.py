@@ -1,19 +1,14 @@
 import boto3
-from boto3.dynamodb.conditions import Key, Attr
-from flask import request
+from boto3.dynamodb.conditions import Attr, Key
 from botocore.exceptions import ClientError
+from flask import request
 from marshmallow import ValidationError
 
-from models.ec2_model import EC2ScheduleModel
-from utils.session import provide_session
-from schemas.ec2_schema import (
-    ec2_schema,
-    ec2_collection_schema,
-    EC2SCollection,
-    ec2_dynamo_schema,
-)
-
 from main import app
+from models.ec2_model import EC2ScheduleModel
+from schemas.ec2_schema import (EC2SCollection, ec2_collection_schema,
+                                ec2_dynamo_schema, ec2_schema)
+from utils.session import provide_session
 
 
 @app.route("/")

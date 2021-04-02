@@ -12,9 +12,11 @@ def provide_session(func):
     database transaction, you pass it to the function, if not this wrapper
     will create one and close it for you.
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         dynamodb = boto3.resource("dynamodb")
         session = dynamodb.Table("opslyft")
         return func(*args, session=session, **kwargs)
+
     return wrapper
